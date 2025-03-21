@@ -96,7 +96,7 @@ const UsernameGenerator: React.FC<UsernameGeneratorProps> = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <GlowingEffect disabled={false} />
+      <GlowingEffect disabled={false} id="username-generator" />
       <h2 className="text-xl font-semibold mb-4">Username Generator</h2>
       
       <div className="space-y-4">

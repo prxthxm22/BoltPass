@@ -92,7 +92,7 @@ const PasswordGenerator: React.FC<PasswordGeneratorProps> = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.1 }}
     >
-      <GlowingEffect disabled={false} />
+      <GlowingEffect disabled={false} id="password-generator" />
       <h2 className="text-xl font-semibold mb-4">Password Generator</h2>
       
       <div className="space-y-4">

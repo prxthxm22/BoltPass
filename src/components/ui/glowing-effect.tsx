@@ -15,19 +15,21 @@ interface GlowingEffectProps {
   disabled?: boolean;
   movementDuration?: number;
   borderWidth?: number;
+  id?: string;
 }
 const GlowingEffect = memo(
   ({
     blur = 0,
     inactiveZone = 0.7,
     proximity = 0,
-    spread = 20,
+    spread = 35,
     variant = "default",
     glow = false,
     className,
     movementDuration = 2,
-    borderWidth = 1,
+    borderWidth = 2,
     disabled = true,
+    id = "default",
   }: GlowingEffectProps) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const lastPosition = useRef({ x: 0, y: 0 });
@@ -101,7 +103,22 @@ const GlowingEffect = memo(
       if (disabled) return;
 
       const handleScroll = () => handleMove();
-      const handlePointerMove = (e: PointerEvent) => handleMove(e);
+      
+      const handlePointerMove = (e: PointerEvent) => {
+        const activeGlowEl = document.getElementById(`active-glow-${id}`);
+        
+        if (!activeGlowEl || activeGlowEl.getAttribute('data-id') === id) {
+          document.querySelectorAll('[id^="active-glow-"]').forEach(el => el.remove());
+          
+          const newActiveEl = document.createElement('div');
+          newActiveEl.id = `active-glow-${id}`;
+          newActiveEl.setAttribute('data-id', id);
+          newActiveEl.style.display = 'none';
+          document.body.appendChild(newActiveEl);
+          
+          handleMove(e);
+        }
+      };
 
       window.addEventListener("scroll", handleScroll, { passive: true });
       document.body.addEventListener("pointermove", handlePointerMove, {
@@ -115,7 +132,7 @@ const GlowingEffect = memo(
         window.removeEventListener("scroll", handleScroll);
         document.body.removeEventListener("pointermove", handlePointerMove);
       };
-    }, [handleMove, disabled]);
+    }, [handleMove, disabled, id]);
 
     return (
       <>

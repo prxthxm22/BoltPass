@@ -99,7 +99,7 @@ const CredentialsList: React.FC<CredentialsListProps> = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.2 }}
     >
-      <GlowingEffect disabled={false} />
+      <GlowingEffect disabled={false} id="credentials-list" />
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold">Generated Credentials</h2>
         <div className="flex gap-2">

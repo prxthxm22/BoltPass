@@ -65,7 +65,7 @@ const PDFExport: React.FC<PDFExportProps> = ({ credentials, className }) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.3 }}
     >
-      <GlowingEffect disabled={false} />
+      <GlowingEffect disabled={false} id="pdf-export" />
       <div className="flex items-center gap-2 mb-4">
         <FileText size={20} />
         <h2 className="text-xl font-semibold">Export to PDF</h2>
