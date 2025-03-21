@@ -11,6 +11,7 @@ import { Shield, Zap, Lock } from 'lucide-react';
 import { toast } from "sonner";
 import { downloadPDF } from '../utils/pdfGenerator';
 import { GlowingEffect } from '@/components/ui/glowing-effect';
+import { ShimmerButton } from '@/components/ui/shimmer-button';
 
 const Index = () => {
   const [credentials, setCredentials] = useState<Credential[]>([]);
@@ -128,10 +129,19 @@ const Index = () => {
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="inline-flex items-center justify-center p-1.5 px-3 rounded-full bg-white/5 border border-white/10 text-xs font-medium uppercase tracking-wider mb-4 relative"
+            className="inline-block mb-4"
           >
-            <Zap size={14} className="mr-1.5" />
-            Secure Password Management
+            <ShimmerButton 
+              shimmerColor="#ffffff" 
+              shimmerSize="0.05em"
+              shimmerDuration="3s"
+              borderRadius="100px"
+              background="rgba(0, 0, 0, 0.2)"
+              className="text-xs font-medium uppercase tracking-wider"
+            >
+              <Zap size={14} className="mr-1.5 inline-block" />
+              Secure Password Management
+            </ShimmerButton>
           </motion.div>
           
           <motion.h1 
