@@ -19,15 +19,15 @@ interface GlowingEffectProps {
 }
 const GlowingEffect = memo(
   ({
-    blur = 0,
+    blur = 0.5,
     inactiveZone = 0.7,
-    proximity = 0,
-    spread = 35,
+    proximity = 35,
+    spread = 20,
     variant = "default",
     glow = false,
     className,
     movementDuration = 2,
-    borderWidth = 2,
+    borderWidth = 3,
     disabled = true,
     id = "default",
   }: GlowingEffectProps) => {

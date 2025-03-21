@@ -1,188 +1,232 @@
-import React, { useState } from 'react';
-import { UsernameOptions, UsernameCategory } from '../types';
-import { generateUsername } from '../utils/generators';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Slider } from '@/components/ui/slider';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { RefreshCw, Copy, Check } from 'lucide-react';
-import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Slider } from '@/components/ui/slider';
+import { Label } from '@/components/ui/label';
+import { Sparkles, Copy, Plus, Check, RefreshCw, User } from 'lucide-react';
 import { GlowingEffect } from '@/components/ui/glowing-effect';
+import { Credential } from '@/types';
 
 interface UsernameGeneratorProps {
-  onGenerate: (username: string) => void;
-  onAdd?: () => void;
+  onGenerate: (credential: Credential) => void;
   className?: string;
 }
 
-const UsernameGenerator: React.FC<UsernameGeneratorProps> = ({ 
-  onGenerate,
-  onAdd,
-  className 
-}) => {
-  const [options, setOptions] = useState<UsernameOptions>({
-    category: 'tech',
-    length: 12,
-    customWords: []
-  });
-  
-  const [generatedUsername, setGeneratedUsername] = useState<string>('');
-  const [customInput, setCustomInput] = useState<string>('');
+const CATEGORIES = [
+  { id: 'animals', label: 'Animals', words: ['wolf', 'tiger', 'eagle', 'dolphin', 'bear', 'lion', 'fox', 'hawk', 'shark', 'panda'] },
+  { id: 'nature', label: 'Nature', words: ['ocean', 'mountain', 'forest', 'river', 'storm', 'sunset', 'thunder', 'volcano', 'glacier', 'canyon'] },
+  { id: 'tech', label: 'Tech', words: ['pixel', 'cyber', 'digital', 'quantum', 'binary', 'vector', 'neural', 'crypto', 'nano', 'tech'] },
+  { id: 'fantasy', label: 'Fantasy', words: ['wizard', 'dragon', 'shadow', 'mystic', 'phoenix', 'frost', 'crystal', 'arcane', 'ember', 'fae'] },
+];
+
+const UsernameGenerator: React.FC<UsernameGeneratorProps> = ({ onGenerate, className }) => {
+  const [username, setUsername] = useState<string>('');
+  const [customWords, setCustomWords] = useState<string>('');
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(['animals', 'tech']);
+  const [length, setLength] = useState<number>(12);
   const [copied, setCopied] = useState<boolean>(false);
-  
-  const handleCategoryChange = (value: string) => {
-    setOptions({
-      ...options,
-      category: value as UsernameCategory
-    });
-  };
-  
-  const handleLengthChange = (value: number[]) => {
-    setOptions({
-      ...options,
-      length: value[0]
-    });
-  };
-  
-  const handleCustomInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setCustomInput(e.target.value);
+  const [includeNumbers, setIncludeNumbers] = useState<boolean>(true);
+
+  // Generate username on component mount and when config changes
+  useEffect(() => {
+    generateUsername();
+  }, [selectedCategories, length, includeNumbers]);
+
+  const generateUsername = () => {
+    // Get all words from selected categories
+    const allWords: string[] = [];
     
-    // Parse custom words
-    const words = e.target.value
-      .split(',')
-      .map(word => word.trim())
-      .filter(word => word.length > 0);
+    selectedCategories.forEach(catId => {
+      const category = CATEGORIES.find(c => c.id === catId);
+      if (category) {
+        allWords.push(...category.words);
+      }
+    });
     
-    setOptions({
-      ...options,
-      customWords: words
+    // Add custom words if any
+    if (customWords.trim()) {
+      allWords.push(...customWords.split(',').map(word => word.trim()).filter(Boolean));
+    }
+    
+    if (allWords.length === 0) {
+      setUsername('Please select categories');
+      return;
+    }
+    
+    // Generate username from random words
+    const randomWord = () => allWords[Math.floor(Math.random() * allWords.length)];
+    let generatedName = randomWord() + randomWord();
+    
+    // Add random numbers if enabled
+    if (includeNumbers) {
+      generatedName += Math.floor(Math.random() * 1000);
+    }
+    
+    // Truncate or pad to match desired length
+    if (generatedName.length > length) {
+      generatedName = generatedName.substring(0, length);
+    } else if (generatedName.length < length && includeNumbers) {
+      // Pad with numbers if needed
+      while (generatedName.length < length) {
+        generatedName += Math.floor(Math.random() * 10);
+      }
+    }
+    
+    setUsername(generatedName);
+    setCopied(false);
+  };
+
+  const handleCategoryToggle = (categoryId: string) => {
+    setSelectedCategories(prev => {
+      if (prev.includes(categoryId)) {
+        return prev.filter(id => id !== categoryId);
+      } else {
+        return [...prev, categoryId];
+      }
     });
   };
-  
-  const handleGenerate = () => {
-    try {
-      const username = generateUsername(options);
-      setGeneratedUsername(username);
-      onGenerate(username);
-    } catch (error) {
-      console.error('Error generating username:', error);
-    }
-  };
-  
-  const handleUse = () => {
-    if (generatedUsername && onAdd) {
-      onAdd();
-    }
-  };
-  
-  const handleCopy = () => {
-    navigator.clipboard.writeText(generatedUsername);
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(username);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
-  
+
+  const handleAddCredential = () => {
+    if (!username) return;
+    
+    const newCredential: Credential = {
+      id: Date.now().toString(),
+      username,
+      password: '',
+      notes: '',
+      createdAt: new Date()
+    };
+    
+    onGenerate(newCredential);
+  };
+
   return (
     <motion.div 
-      className={`glass-card p-6 rounded-xl w-full relative ${className}`}
+      className={`glass-card p-6 rounded-xl relative ${className}`}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
       <GlowingEffect disabled={false} id="username-generator" />
-      <h2 className="text-xl font-semibold mb-4">Username Generator</h2>
+      <div className="flex items-center gap-2 mb-4">
+        <User className="h-5 w-5" />
+        <h2 className="text-xl font-semibold">Username Generator</h2>
+      </div>
       
       <div className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="username-category">Category</Label>
-          <Select 
-            value={options.category} 
-            onValueChange={handleCategoryChange}
-          >
-            <SelectTrigger id="username-category" className="bg-muted">
-              <SelectValue placeholder="Select category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="tech">Tech</SelectItem>
-              <SelectItem value="nature">Nature</SelectItem>
-              <SelectItem value="food">Food</SelectItem>
-              <SelectItem value="random">Random</SelectItem>
-              <SelectItem value="custom">Custom</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        
-        {options.category === 'custom' && (
-          <div className="space-y-2">
-            <Label htmlFor="custom-words">
-              Custom Words (comma separated)
-            </Label>
-            <Textarea
-              id="custom-words"
-              value={customInput}
-              onChange={handleCustomInputChange}
-              placeholder="digital, cyber, cloud, tech"
-              className="bg-muted"
-            />
-          </div>
-        )}
-        
-        <div className="space-y-2">
-          <div className="flex justify-between">
-            <Label htmlFor="username-length">Length</Label>
-            <span className="text-sm text-muted-foreground">
-              {options.length} characters
-            </span>
-          </div>
-          <Slider
-            id="username-length"
-            min={6}
-            max={20}
-            step={1}
-            value={[options.length]}
-            onValueChange={handleLengthChange}
-            className="my-4"
-          />
-        </div>
-        
-        <div className="pt-2">
-          <Button 
-            onClick={handleGenerate} 
-            className="w-full gap-2 font-medium"
-          >
-            <RefreshCw size={16} className="mr-1" />
-            Generate Username
-          </Button>
-        </div>
-        
-        {generatedUsername && (
-          <div className="mt-4 space-y-2 animate-fade-in">
-            <Label htmlFor="generated-username">Generated Username</Label>
-            <div className="flex gap-2">
-              <Input
-                id="generated-username"
-                value={generatedUsername}
-                readOnly
-                className="bg-muted"
-              />
+        <div>
+          <div className="mb-2 flex justify-between items-center">
+            <Label htmlFor="username">Generated Username</Label>
+            <div className="flex items-center gap-1">
               <Button 
-                variant="outline" 
-                size="icon"
-                onClick={handleCopy}
-                title="Copy to clipboard"
+                variant="ghost" 
+                size="sm" 
+                onClick={generateUsername}
+                className="h-7 px-2"
               >
-                {copied ? <Check size={16} /> : <Copy size={16} />}
+                <RefreshCw size={14} />
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={copyToClipboard}
+                className="h-7 px-2"
+                disabled={!username}
+              >
+                {copied ? <Check size={14} /> : <Copy size={14} />}
               </Button>
             </div>
           </div>
-        )}
+          <div className="relative">
+            <Input
+              id="username"
+              value={username}
+              readOnly
+              className="pr-20 bg-zinc-900/50"
+            />
+            <Button
+              size="sm"
+              onClick={handleAddCredential}
+              className="absolute right-1 top-1/2 transform -translate-y-1/2 h-7 gap-1"
+              disabled={!username}
+            >
+              <Plus size={14} />
+              Add
+            </Button>
+          </div>
+        </div>
+        
+        <div>
+          <Label htmlFor="length">Length ({length} characters)</Label>
+          <Slider
+            id="length"
+            min={6}
+            max={20}
+            step={1}
+            value={[length]}
+            onValueChange={(values) => setLength(values[0])}
+            className="mt-2"
+          />
+        </div>
+        
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            id="include-numbers"
+            checked={includeNumbers}
+            onCheckedChange={(checked) => setIncludeNumbers(!!checked)}
+          />
+          <Label htmlFor="include-numbers" className="text-sm cursor-pointer">
+            Include numbers
+          </Label>
+        </div>
+        
+        <div className="space-y-2">
+          <Label className="text-sm">Categories</Label>
+          <div className="grid grid-cols-2 gap-2">
+            {CATEGORIES.map((category) => (
+              <div key={category.id} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`category-${category.id}`}
+                  checked={selectedCategories.includes(category.id)}
+                  onCheckedChange={() => handleCategoryToggle(category.id)}
+                />
+                <Label 
+                  htmlFor={`category-${category.id}`}
+                  className="text-sm cursor-pointer"
+                >
+                  {category.label}
+                </Label>
+              </div>
+            ))}
+          </div>
+        </div>
+        
+        <div>
+          <Label htmlFor="custom-words">Custom Words (comma separated)</Label>
+          <Input
+            id="custom-words"
+            value={customWords}
+            onChange={(e) => setCustomWords(e.target.value)}
+            placeholder="e.g. ninja, hero, legend"
+            className="mt-1 bg-zinc-900/50"
+          />
+        </div>
+        
+        <Button 
+          onClick={generateUsername} 
+          className="w-full gap-2"
+        >
+          <Sparkles size={16} />
+          Generate New Username
+        </Button>
       </div>
     </motion.div>
   );

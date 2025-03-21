@@ -1,3 +1,4 @@
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
 
 @tailwind base;
@@ -35,18 +36,6 @@
     --ring: 0 0% 83.9%;
 
     --radius: 0.75rem;
-    
-    --rainbow-gradient: linear-gradient(
-      to right,
-      #ff0000,
-      #ffa500,
-      #ffff00,
-      #008000,
-      #0000ff,
-      #4b0082,
-      #ee82ee,
-      #ff0000
-    );
   }
 }
 
