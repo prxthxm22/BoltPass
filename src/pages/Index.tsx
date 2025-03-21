@@ -136,7 +136,9 @@ const Index = () => {
               mode="colorShift"
               blur="medium"
               scale={1.05}
-              buttonClassName="bg-white/5 border border-white/10 px-4 py-2"
+              duration={4}
+              borderWidth={3}
+              buttonClassName="px-4 py-2"
             >
               <Zap size={14} className="mr-1.5" />
               Secure Password Management

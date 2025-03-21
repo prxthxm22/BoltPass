@@ -13,6 +13,7 @@ export interface GlowEffectButtonProps {
   scale?: number;
   className?: string;
   buttonClassName?: string;
+  borderWidth?: number;
 }
 
 export function GlowEffectButton({
@@ -25,23 +26,34 @@ export function GlowEffectButton({
   scale = 0.9,
   className = '',
   buttonClassName = '',
+  borderWidth = 2,
 }: GlowEffectButtonProps) {
   return (
-    <div className={cn('relative', className)}>
-      <GlowEffect
-        colors={colors}
-        mode={mode}
-        blur={blur}
-        duration={duration}
-        scale={scale}
-      />
-      <button className={cn(
-        'relative inline-flex items-center justify-center gap-1 rounded-full bg-zinc-950 px-3 py-1.5 text-xs font-medium uppercase tracking-wider text-zinc-50 border border-white/10', 
-        buttonClassName
-      )}>
-        {children}
-        {rightIcon}
-      </button>
+    <div className={cn('relative inline-block', className)}>
+      <div 
+        className="relative rounded-full overflow-hidden" 
+        style={{ padding: `${borderWidth}px` }}
+      >
+        {/* Glow effect in the border */}
+        <div className="absolute inset-0 z-0">
+          <GlowEffect
+            colors={colors}
+            mode={mode}
+            blur={blur}
+            duration={duration}
+            scale={scale}
+          />
+        </div>
+        
+        {/* Button with black background */}
+        <div className={cn(
+          'relative z-10 flex items-center justify-center gap-1 rounded-full bg-zinc-950 px-3 py-1.5 text-xs font-medium uppercase tracking-wider text-zinc-50', 
+          buttonClassName
+        )}>
+          {children}
+          {rightIcon && rightIcon}
+        </div>
+      </div>
     </div>
   );
 } 
