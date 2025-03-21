@@ -1,290 +1,214 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Input } from '@/components/ui/input';
+import { PasswordOptions, PasswordStrength } from '../types';
+import { generatePassword, calculatePasswordStrength } from '../utils/generators';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Slider } from '@/components/ui/slider';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Sparkles, Copy, Plus, Check, RefreshCw, Key, Shuffle } from 'lucide-react';
-import { GlowingEffect } from '@/components/ui/glowing-effect';
-import { calculatePasswordStrength } from '../utils/generators';
+import { Slider } from '@/components/ui/slider';
+import { Switch } from '@/components/ui/switch';
+import { RefreshCw, Eye, EyeOff, Copy, Check } from 'lucide-react';
+import { motion } from 'framer-motion';
 import PasswordStrengthMeter from './PasswordStrengthMeter';
-import { Credential } from '@/types';
+import { toast } from 'sonner';
+import { GlowingEffect } from '@/components/ui/glowing-effect';
 
 interface PasswordGeneratorProps {
-  onGenerate: (credential: Credential) => void;
+  onGenerate: (password: string) => void;
+  onAdd?: () => void;
   className?: string;
 }
 
-const PasswordGenerator: React.FC<PasswordGeneratorProps> = ({ onGenerate, className }) => {
-  const [password, setPassword] = useState<string>('');
-  const [length, setLength] = useState<number>(16);
-  const [includeUppercase, setIncludeUppercase] = useState<boolean>(true);
-  const [includeLowercase, setIncludeLowercase] = useState<boolean>(true);
-  const [includeNumbers, setIncludeNumbers] = useState<boolean>(true);
-  const [includeSymbols, setIncludeSymbols] = useState<boolean>(true);
-  const [excludeSimilar, setExcludeSimilar] = useState<boolean>(true);
+const PasswordGenerator: React.FC<PasswordGeneratorProps> = ({
+  onGenerate,
+  onAdd,
+  className
+}) => {
+  const [options, setOptions] = useState<PasswordOptions>({
+    length: 16,
+    includeLowercase: true,
+    includeUppercase: true,
+    includeNumbers: true,
+    includeSymbols: true
+  });
+  
+  const [generatedPassword, setGeneratedPassword] = useState<string>('');
+  const [passwordStrength, setPasswordStrength] = useState<PasswordStrength>('very-weak');
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
-  const [strength, setStrength] = useState<number>(0);
-
-  // Generate password on component mount and when config changes
+  
   useEffect(() => {
-    generatePassword();
-  }, [length, includeUppercase, includeLowercase, includeNumbers, includeSymbols, excludeSimilar]);
-
-  // Calculate password strength when password changes
-  useEffect(() => {
-    if (password) {
-      const passwordStrength = calculatePasswordStrength(password);
-      setStrength(passwordStrength);
+    if (generatedPassword) {
+      setPasswordStrength(calculatePasswordStrength(generatedPassword));
     }
-  }, [password]);
-
-  const generatePassword = () => {
-    // Ensure at least one character set is selected
-    if (!includeUppercase && !includeLowercase && !includeNumbers && !includeSymbols) {
-      setPassword('Select at least one character set');
+  }, [generatedPassword]);
+  
+  const handleLengthChange = (value: number[]) => {
+    setOptions({
+      ...options,
+      length: value[0]
+    });
+  };
+  
+  const handleOptionChange = (option: keyof Omit<PasswordOptions, 'length'>) => {
+    setOptions({
+      ...options,
+      [option]: !options[option as keyof Omit<PasswordOptions, 'length'>]
+    });
+  };
+  
+  const handleGenerate = () => {
+    // Check if at least one option is selected
+    if (!options.includeLowercase && !options.includeUppercase && 
+        !options.includeNumbers && !options.includeSymbols) {
+      toast.error('Please select at least one character type');
       return;
     }
-
-    // Define character sets
-    const uppercaseChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const lowercaseChars = 'abcdefghijklmnopqrstuvwxyz';
-    const numberChars = '0123456789';
-    const symbolChars = '!@#$%^&*()-_=+[]{}|;:,.<>?';
     
-    // Remove similar characters if excludeSimilar is checked
-    const similarChars = 'Il1O0o';
-    
-    // Create a pool of characters based on selected options
-    let charPool = '';
-    if (includeUppercase) charPool += uppercaseChars;
-    if (includeLowercase) charPool += lowercaseChars;
-    if (includeNumbers) charPool += numberChars;
-    if (includeSymbols) charPool += symbolChars;
-    
-    // Remove similar characters if option selected
-    if (excludeSimilar) {
-      for (const char of similarChars) {
-        charPool = charPool.replace(new RegExp(char, 'g'), '');
-      }
-    }
-    
-    // Generate password
-    let generatedPassword = '';
-    
-    // Ensure at least one character from each selected group
-    if (includeUppercase) {
-      const char = uppercaseChars[Math.floor(Math.random() * uppercaseChars.length)];
-      generatedPassword += excludeSimilar && similarChars.includes(char) ? 'A' : char;
-    }
-    
-    if (includeLowercase) {
-      const char = lowercaseChars[Math.floor(Math.random() * lowercaseChars.length)];
-      generatedPassword += excludeSimilar && similarChars.includes(char) ? 'a' : char;
-    }
-    
-    if (includeNumbers) {
-      const char = numberChars[Math.floor(Math.random() * numberChars.length)];
-      generatedPassword += excludeSimilar && similarChars.includes(char) ? '2' : char;
-    }
-    
-    if (includeSymbols) {
-      generatedPassword += symbolChars[Math.floor(Math.random() * symbolChars.length)];
-    }
-    
-    // Fill the rest of the password
-    while (generatedPassword.length < length) {
-      generatedPassword += charPool[Math.floor(Math.random() * charPool.length)];
-    }
-    
-    // Shuffle the password characters
-    generatedPassword = generatedPassword
-      .split('')
-      .sort(() => Math.random() - 0.5)
-      .join('');
-    
-    // Trim to desired length
-    generatedPassword = generatedPassword.substring(0, length);
-    
-    setPassword(generatedPassword);
-    setCopied(false);
+    const password = generatePassword(options);
+    setGeneratedPassword(password);
+    onGenerate(password);
   };
-
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(password);
+  
+  const handleToggleVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+  
+  const handleCopy = () => {
+    navigator.clipboard.writeText(generatedPassword);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
-
-  const handleAddCredential = () => {
-    if (!password) return;
-    
-    const newCredential: Credential = {
-      id: Date.now().toString(),
-      username: '',
-      password,
-      notes: '',
-      createdAt: new Date()
-    };
-    
-    onGenerate(newCredential);
+  
+  const handleUse = () => {
+    if (generatedPassword && onAdd) {
+      onAdd();
+    }
   };
-
+  
   return (
     <motion.div 
-      className={`glass-card p-6 rounded-xl relative ${className}`}
+      className={`glass-card p-6 rounded-xl w-full relative ${className}`}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.1 }}
     >
       <GlowingEffect disabled={false} id="password-generator" />
-      <div className="flex items-center gap-2 mb-4">
-        <Key className="h-5 w-5" />
-        <h2 className="text-xl font-semibold">Password Generator</h2>
-      </div>
+      <h2 className="text-xl font-semibold mb-4">Password Generator</h2>
       
       <div className="space-y-4">
-        <div>
-          <div className="mb-2 flex justify-between items-center">
-            <Label htmlFor="password">Generated Password</Label>
-            <div className="flex items-center gap-1">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={generatePassword}
-                className="h-7 px-2"
-              >
-                <RefreshCw size={14} />
-              </Button>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={copyToClipboard}
-                className="h-7 px-2"
-                disabled={!password}
-              >
-                {copied ? <Check size={14} /> : <Copy size={14} />}
-              </Button>
-            </div>
+        <div className="space-y-2">
+          <div className="flex justify-between">
+            <Label htmlFor="password-length">Length</Label>
+            <span className="text-sm text-muted-foreground">
+              {options.length} characters
+            </span>
           </div>
-          <div className="relative">
-            <Input
-              id="password"
-              value={password}
-              readOnly
-              className="pr-20 font-mono bg-zinc-900/50"
-            />
-            <Button
-              size="sm"
-              onClick={handleAddCredential}
-              className="absolute right-1 top-1/2 transform -translate-y-1/2 h-7 gap-1"
-              disabled={!password}
-            >
-              <Plus size={14} />
-              Add
-            </Button>
-          </div>
-          {password && (
-            <PasswordStrengthMeter strength={strength} className="mt-2" />
-          )}
-        </div>
-        
-        <div>
-          <Label htmlFor="length">Length ({length} characters)</Label>
           <Slider
-            id="length"
-            min={8}
+            id="password-length"
+            min={5}
             max={32}
             step={1}
-            value={[length]}
-            onValueChange={(values) => setLength(values[0])}
-            className="mt-2"
+            value={[options.length]}
+            onValueChange={handleLengthChange}
+            className="my-4"
           />
         </div>
         
-        <div className="space-y-2">
-          <Label>Character Sets</Label>
-          <div className="grid grid-cols-2 gap-2">
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="include-uppercase"
-                checked={includeUppercase}
-                onCheckedChange={(checked) => setIncludeUppercase(!!checked)}
-              />
-              <Label 
-                htmlFor="include-uppercase"
-                className="text-sm cursor-pointer"
-              >
-                Uppercase (A-Z)
-              </Label>
-            </div>
-            
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="include-lowercase"
-                checked={includeLowercase}
-                onCheckedChange={(checked) => setIncludeLowercase(!!checked)}
-              />
-              <Label 
-                htmlFor="include-lowercase"
-                className="text-sm cursor-pointer"
-              >
-                Lowercase (a-z)
-              </Label>
-            </div>
-            
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="include-numbers"
-                checked={includeNumbers}
-                onCheckedChange={(checked) => setIncludeNumbers(!!checked)}
-              />
-              <Label 
-                htmlFor="include-numbers"
-                className="text-sm cursor-pointer"
-              >
-                Numbers (0-9)
-              </Label>
-            </div>
-            
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="include-symbols"
-                checked={includeSymbols}
-                onCheckedChange={(checked) => setIncludeSymbols(!!checked)}
-              />
-              <Label 
-                htmlFor="include-symbols"
-                className="text-sm cursor-pointer"
-              >
-                Symbols (!@#$%...)
-              </Label>
-            </div>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <Label htmlFor="include-lowercase" className="cursor-pointer">
+              Include Lowercase (a-z)
+            </Label>
+            <Switch
+              id="include-lowercase"
+              checked={options.includeLowercase}
+              onCheckedChange={() => handleOptionChange('includeLowercase')}
+            />
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <Label htmlFor="include-uppercase" className="cursor-pointer">
+              Include Uppercase (A-Z)
+            </Label>
+            <Switch
+              id="include-uppercase"
+              checked={options.includeUppercase}
+              onCheckedChange={() => handleOptionChange('includeUppercase')}
+            />
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <Label htmlFor="include-numbers" className="cursor-pointer">
+              Include Numbers (0-9)
+            </Label>
+            <Switch
+              id="include-numbers"
+              checked={options.includeNumbers}
+              onCheckedChange={() => handleOptionChange('includeNumbers')}
+            />
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <Label htmlFor="include-symbols" className="cursor-pointer">
+              Include Symbols (!@#$...)
+            </Label>
+            <Switch
+              id="include-symbols"
+              checked={options.includeSymbols}
+              onCheckedChange={() => handleOptionChange('includeSymbols')}
+            />
           </div>
         </div>
         
-        <div className="flex items-center space-x-2">
-          <Checkbox
-            id="exclude-similar"
-            checked={excludeSimilar}
-            onCheckedChange={(checked) => setExcludeSimilar(!!checked)}
-          />
-          <Label 
-            htmlFor="exclude-similar"
-            className="text-sm cursor-pointer"
+        <div className="pt-2">
+          <Button 
+            onClick={handleGenerate} 
+            className="w-full gap-2 font-medium"
           >
-            Exclude similar characters (I, l, 1, O, 0, o)
-          </Label>
+            <RefreshCw size={16} className="mr-1" />
+            Generate Password
+          </Button>
         </div>
         
-        <Button 
-          onClick={generatePassword} 
-          className="w-full gap-2"
-        >
-          <Shuffle size={16} />
-          Generate New Password
-        </Button>
+        {generatedPassword && (
+          <div className="mt-4 space-y-2 animate-fade-in">
+            <Label htmlFor="generated-password">Generated Password</Label>
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <Input
+                  id="generated-password"
+                  type={showPassword ? 'text' : 'password'}
+                  value={generatedPassword}
+                  readOnly
+                  className="bg-muted pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={handleToggleVisibility}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+              <Button 
+                variant="outline" 
+                size="icon"
+                onClick={handleCopy}
+                title="Copy to clipboard"
+              >
+                {copied ? <Check size={16} /> : <Copy size={16} />}
+              </Button>
+              <Button 
+                variant="default" 
+                onClick={handleUse}
+              >
+                + Add
+              </Button>
+            </div>
+            
+            <PasswordStrengthMeter strength={passwordStrength} />
+          </div>
+        )}
       </div>
     </motion.div>
   );

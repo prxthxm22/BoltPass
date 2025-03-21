@@ -1,15 +1,14 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState } from 'react';
 import { Credential } from '../types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trash2, Edit, Save, Eye, EyeOff, Plus, FileText, AlertTriangle } from 'lucide-react';
+import { Trash2, Edit, Save, Eye, EyeOff, Plus, FileText } from 'lucide-react';
 import { calculatePasswordStrength } from '../utils/generators';
 import PasswordStrengthMeter from './PasswordStrengthMeter';
 import { GlowingEffect } from '@/components/ui/glowing-effect';
-import { Skeleton } from '@/components/ui/skeleton';
 
 interface CredentialsListProps {
   credentials: Credential[];
@@ -17,7 +16,6 @@ interface CredentialsListProps {
   onUpdate: (credential: Credential) => void;
   onDelete: (id: string) => void;
   onExport: () => void;
-  isLoading?: boolean;
   className?: string;
 }
 
@@ -27,23 +25,11 @@ const CredentialsList: React.FC<CredentialsListProps> = ({
   onUpdate,
   onDelete,
   onExport,
-  isLoading = false,
   className
 }) => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [visiblePasswords, setVisiblePasswords] = useState<Set<string>>(new Set());
   const [editForm, setEditForm] = useState<Partial<Credential>>({});
-  const [searchTerm, setSearchTerm] = useState<string>('');
-  
-  const filteredCredentials = useCallback(() => {
-    if (!searchTerm.trim()) return credentials;
-    
-    const term = searchTerm.toLowerCase();
-    return credentials.filter(cred => 
-      cred.username.toLowerCase().includes(term) || 
-      cred.notes.toLowerCase().includes(term)
-    );
-  }, [credentials, searchTerm]);
   
   const handleAddNew = () => {
     const newCredential: Credential = {
@@ -106,22 +92,6 @@ const CredentialsList: React.FC<CredentialsListProps> = ({
     });
   };
   
-  // Render loading skeletons when loading
-  const renderSkeletons = () => {
-    return Array(3).fill(0).map((_, i) => (
-      <div key={`skeleton-${i}`} className="border border-white/10 rounded-lg p-4 mb-4">
-        <div className="flex justify-between mb-3">
-          <Skeleton className="h-5 w-32" />
-          <Skeleton className="h-5 w-16" />
-        </div>
-        <Skeleton className="h-4 w-full mb-2" />
-        <Skeleton className="h-4 w-3/4" />
-      </div>
-    ));
-  };
-  
-  const displayedCredentials = filteredCredentials();
-  
   return (
     <motion.div 
       className={`glass-card p-6 rounded-xl w-full relative ${className}`}
@@ -130,225 +100,178 @@ const CredentialsList: React.FC<CredentialsListProps> = ({
       transition={{ duration: 0.5, delay: 0.2 }}
     >
       <GlowingEffect disabled={false} id="credentials-list" />
-      <div className="flex flex-col gap-4 mb-4">
-        <div className="flex justify-between items-center">
-          <h2 className="text-xl font-semibold">Generated Credentials</h2>
-          <div className="flex gap-2">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={onExport}
-              className="gap-1"
-              disabled={isLoading || credentials.length === 0}
-            >
-              <FileText size={16} />
-              Export
-            </Button>
-          </div>
-        </div>
-        
-        <div className="relative">
-          <Input 
-            placeholder="Search credentials..." 
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="bg-zinc-900/50"
-            disabled={isLoading}
-          />
-          {searchTerm && displayedCredentials.length === 0 && !isLoading && (
-            <div className="mt-2 text-yellow-400 text-sm flex items-center gap-2">
-              <AlertTriangle size={14} />
-              <span>No credentials found matching "{searchTerm}"</span>
-            </div>
-          )}
-        </div>
-      </div>
-      
-      {isLoading ? (
-        renderSkeletons()
-      ) : displayedCredentials.length === 0 && !searchTerm ? (
-        <div className="text-center py-12 text-muted-foreground">
-          <p>No credentials yet. Generate some above!</p>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-semibold">Generated Credentials</h2>
+        <div className="flex gap-2">
           <Button 
             variant="outline" 
             size="sm" 
-            onClick={handleAddNew}
-            className="mt-4 gap-1"
+            onClick={onExport}
+            className="gap-1"
+            disabled={credentials.length === 0}
           >
-            <Plus size={16} />
-            Add Manually
+            <FileText size={16} />
+            Export
           </Button>
         </div>
+      </div>
+      
+      {credentials.length === 0 ? (
+        <div className="text-center py-12 text-muted-foreground">
+          <p>No credentials yet. Generate some above!</p>
+        </div>
       ) : (
-        <>
-          <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
-            <AnimatePresence>
-              {displayedCredentials.map((credential) => (
-                <motion.div
-                  key={credential.id}
-                  className="border border-white/10 rounded-lg p-4"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, height: 0, marginBottom: 0, overflow: 'hidden' }}
-                  transition={{ duration: 0.2 }}
-                >
-                  {editingId === credential.id ? (
-                    <div className="space-y-3">
-                      <div>
-                        <Label htmlFor={`username-${credential.id}`}>Username</Label>
+        <div className="space-y-4">
+          <AnimatePresence>
+            {credentials.map((credential) => (
+              <motion.div
+                key={credential.id}
+                className="border border-border rounded-lg p-4 bg-muted/30"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+                layout
+              >
+                {editingId === credential.id ? (
+                  <div className="space-y-3">
+                    <div>
+                      <Label htmlFor={`username-${credential.id}`}>Username</Label>
+                      <Input
+                        id={`username-${credential.id}`}
+                        name="username"
+                        value={editForm.username || ''}
+                        onChange={handleInputChange}
+                        className="mt-1"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor={`password-${credential.id}`}>Password</Label>
+                      <div className="relative">
                         <Input
-                          id={`username-${credential.id}`}
-                          name="username"
-                          value={editForm.username || ''}
+                          id={`password-${credential.id}`}
+                          name="password"
+                          type={visiblePasswords.has(credential.id) ? 'text' : 'password'}
+                          value={editForm.password || ''}
                           onChange={handleInputChange}
-                          className="mt-1"
+                          className="mt-1 pr-10"
                         />
+                        <button
+                          type="button"
+                          onClick={() => togglePasswordVisibility(credential.id)}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                        >
+                          {visiblePasswords.has(credential.id) ? (
+                            <EyeOff size={16} />
+                          ) : (
+                            <Eye size={16} />
+                          )}
+                        </button>
                       </div>
                       
+                      {editForm.password && (
+                        <div className="mt-2">
+                          <PasswordStrengthMeter 
+                            strength={calculatePasswordStrength(editForm.password)} 
+                          />
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor={`notes-${credential.id}`}>Notes</Label>
+                      <Textarea
+                        id={`notes-${credential.id}`}
+                        name="notes"
+                        value={editForm.notes || ''}
+                        onChange={handleInputChange}
+                        placeholder="Add notes about this credential"
+                        className="mt-1"
+                        rows={2}
+                      />
+                    </div>
+                    
+                    <div className="flex justify-end gap-2 pt-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={handleCancel}
+                      >
+                        Cancel
+                      </Button>
+                      <Button 
+                        variant="default" 
+                        size="sm" 
+                        onClick={handleSave}
+                        className="gap-1"
+                      >
+                        <Save size={14} />
+                        Save
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <div className="flex justify-between">
                       <div>
-                        <Label htmlFor={`password-${credential.id}`}>Password</Label>
-                        <div className="relative mt-1">
+                        <h3 className="font-medium">{credential.username}</h3>
+                        <div className="flex items-center mt-1">
                           <Input
-                            id={`password-${credential.id}`}
-                            name="password"
-                            type={visiblePasswords.has(credential.id) ? "text" : "password"}
-                            value={editForm.password || ''}
-                            onChange={handleInputChange}
+                            type={visiblePasswords.has(credential.id) ? 'text' : 'password'}
+                            value={credential.password}
+                            readOnly
+                            className="h-7 py-0 border-none bg-transparent focus-visible:ring-0"
                           />
                           <button
                             type="button"
                             onClick={() => togglePasswordVisibility(credential.id)}
-                            className="absolute right-2 top-1/2 transform -translate-y-1/2"
+                            className="text-muted-foreground hover:text-foreground"
                           >
                             {visiblePasswords.has(credential.id) ? (
-                              <EyeOff size={16} className="text-muted-foreground" />
+                              <EyeOff size={16} />
                             ) : (
-                              <Eye size={16} className="text-muted-foreground" />
+                              <Eye size={16} />
                             )}
                           </button>
                         </div>
-                        
-                        {editForm.password && (
-                          <PasswordStrengthMeter 
-                            strength={calculatePasswordStrength(editForm.password)} 
-                            className="mt-2"
-                          />
-                        )}
                       </div>
                       
-                      <div>
-                        <Label htmlFor={`notes-${credential.id}`}>Notes</Label>
-                        <Textarea
-                          id={`notes-${credential.id}`}
-                          name="notes"
-                          value={editForm.notes || ''}
-                          onChange={handleInputChange}
-                          placeholder="Add notes about this credential"
-                          className="mt-1"
-                          rows={2}
-                        />
-                      </div>
-                      
-                      <div className="flex justify-end gap-2 pt-2">
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={handleCancel}
+                      <div className="flex gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleEdit(credential)}
+                          className="h-8 w-8"
                         >
-                          Cancel
+                          <Edit size={16} />
                         </Button>
-                        <Button 
-                          variant="default" 
-                          size="sm" 
-                          onClick={handleSave}
-                          className="gap-1"
-                          disabled={!editForm.username || !editForm.password}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDelete(credential.id)}
+                          className="h-8 w-8 text-destructive hover:text-destructive"
                         >
-                          <Save size={14} />
-                          Save
+                          <Trash2 size={16} />
                         </Button>
                       </div>
                     </div>
-                  ) : (
-                    <div>
-                      <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <h3 className="font-medium">{credential.username}</h3>
-                          <div className="relative mt-1 flex items-center">
-                            <span className={`${visiblePasswords.has(credential.id) ? '' : 'filter blur-sm select-none'} font-mono text-sm`}>
-                              {credential.password}
-                            </span>
-                            <button
-                              onClick={() => togglePasswordVisibility(credential.id)}
-                              className="ml-2 text-muted-foreground hover:text-white transition-colors"
-                            >
-                              {visiblePasswords.has(credential.id) ? (
-                                <EyeOff size={14} />
-                              ) : (
-                                <Eye size={14} />
-                              )}
-                            </button>
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-center space-x-1">
-                          <Button
-                            size="sm" 
-                            variant="ghost"
-                            onClick={() => handleEdit(credential)}
-                            className="h-8 w-8 p-0"
-                          >
-                            <Edit size={14} />
-                            <span className="sr-only">Edit</span>
-                          </Button>
-                          <Button
-                            size="sm" 
-                            variant="ghost"
-                            onClick={() => handleDelete(credential.id)}
-                            className="h-8 w-8 p-0 text-red-500 hover:text-red-400 hover:bg-red-500/10"
-                          >
-                            <Trash2 size={14} />
-                            <span className="sr-only">Delete</span>
-                          </Button>
-                        </div>
-                      </div>
-                      
-                      {credential.notes && (
-                        <p className="text-sm text-muted-foreground mt-2 border-t border-white/5 pt-2">
-                          {credential.notes}
-                        </p>
-                      )}
-                      
-                      <div className="flex justify-between items-center mt-2 text-xs text-muted-foreground">
-                        <PasswordStrengthMeter 
-                          strength={calculatePasswordStrength(credential.password)} 
-                          className="w-24"
-                        />
-                        <span>
-                          {new Date(credential.createdAt).toLocaleDateString()}
-                        </span>
-                      </div>
+                    
+                    {credential.notes && (
+                      <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
+                        {credential.notes}
+                      </p>
+                    )}
+                    
+                    <div className="mt-1 text-xs text-muted-foreground">
+                      Created: {new Date(credential.createdAt).toLocaleString()}
                     </div>
-                  )}
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </div>
-          
-          {!searchTerm && (
-            <div className="mt-4 flex justify-center">
-              <Button
-                variant="outline" 
-                size="sm"
-                onClick={handleAddNew}
-                className="gap-1"
-              >
-                <Plus size={14} />
-                Add Credential
-              </Button>
-            </div>
-          )}
-        </>
+                  </div>
+                )}
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </div>
       )}
     </motion.div>
   );

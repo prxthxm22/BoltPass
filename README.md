@@ -111,5 +111,5 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ---
 
 <div align="center">
-  Made with ❤️ by <a href="https://github.com/prxthxm22">Pratham Sharma</a>
+  Made with ❤️ by <a href="https://github.com/prxthxm22">Pratham</a>
 </div>
