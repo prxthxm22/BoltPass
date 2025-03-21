@@ -1,69 +1,115 @@
-# Welcome to your Lovable project
+# BoltPass - Secure Password Management
 
-## Project info
+<div align="center">
+  <img src="/lovable-uploads/white_logo.svg" alt="BoltPass Logo" width="300" />
+  <p><em>Modern, secure password management with local storage</em></p>
+</div>
 
-**URL**: https://lovable.dev/projects/9787bca2-febe-4b59-b776-b4e263c2b23f
+## 🔐 Overview
 
-## How can I edit this code?
+BoltPass is a secure credential management application designed to help you generate, store, and organize your passwords with a focus on privacy and security. All credentials are stored locally in your browser, ensuring your sensitive data never leaves your device.
 
-There are several ways of editing your application.
+## ✨ Features
 
-**Use Lovable**
+- **Username Generator**: Create unique usernames based on different categories
+- **Password Generator**: Generate strong passwords with customizable complexity
+- **Local Storage**: All credentials stored locally, never sent to a server
+- **PDF Export**: Export your credentials as a secure PDF for offline backup
+- **Modern UI**: Clean, responsive interface with elegant animations
+- **Dark Mode**: Eye-friendly dark theme for comfortable use
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/9787bca2-febe-4b59-b776-b4e263c2b23f) and start prompting.
+## 🛠️ Technology Stack
 
-Changes made via Lovable will be committed automatically to this repo.
+- **React**: Dynamic UI components and state management
+- **TypeScript**: Type safety throughout the codebase
+- **Tailwind CSS**: Utility-first styling with responsive design
+- **Framer Motion**: Smooth animations and transitions
+- **Lucide Icons**: Beautiful and consistent iconography
 
-**Use your preferred IDE**
+## 🚀 Getting Started
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Prerequisites
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- Node.js (v14 or higher)
+- npm or yarn
 
-Follow these steps:
+### Installation
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+1. Clone the repository
+   ```bash
+   git clone https://github.com/prxthxm22/boltpass-secure.git
+   cd boltpass-secure
+   ```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+2. Install dependencies
+   ```bash
+   npm install
+   # or
+   yarn
+   ```
 
-# Step 3: Install the necessary dependencies.
-npm i
+3. Start the development server
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   ```
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+4. Open your browser and navigate to `http://localhost:5173`
 
-**Edit a file directly in GitHub**
+## 📝 Usage
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Generating Usernames
 
-**Use GitHub Codespaces**
+1. Navigate to the Username Generator card
+2. Select a category (Tech, Nature, Food, etc.)
+3. Adjust the length if needed
+4. Click "Generate Username"
+5. Click "Add" to save it to your credentials list
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### Generating Passwords
 
-## What technologies are used for this project?
+1. Navigate to the Password Generator card
+2. Configure complexity settings (length, include symbols, numbers, etc.)
+3. Click "Generate Password"
+4. Click "Add" to save it with a username to your credentials list
 
-This project is built with .
+### Managing Credentials
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- All credentials are displayed in the Credentials List
+- Edit or delete credentials as needed
+- Export your credentials as a PDF for secure offline storage
 
-## How can I deploy this project?
+## 🔒 Security
 
-Simply open [Lovable](https://lovable.dev/projects/9787bca2-febe-4b59-b776-b4e263c2b23f) and click on Share -> Publish.
+BoltPass is designed with security in mind:
 
-## I want to use a custom domain - is that possible?
+- No server interaction - all data stays on your device
+- Credentials are stored in your browser's localStorage
+- Clear and transparent code available for review
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+## 🤝 Contributing
+
+Contributions are welcome! Feel free to open issues or submit pull requests.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🙏 Acknowledgements
+
+- [Lucide Icons](https://lucide.dev/) for the beautiful icon set
+- [Tailwind CSS](https://tailwindcss.com/) for the utility-first CSS framework
+- [Framer Motion](https://www.framer.com/motion/) for animations
+
+---
+
+<div align="center">
+  Made with ❤️ by <a href="https://github.com/prxthxm22">Pratham Sharma</a>
+</div>
