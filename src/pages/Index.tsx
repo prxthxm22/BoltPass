@@ -11,7 +11,7 @@ import { Shield, Zap, Lock } from 'lucide-react';
 import { toast } from "sonner";
 import { downloadPDF } from '../utils/pdfGenerator';
 import { GlowingEffect } from '@/components/ui/glowing-effect';
-import { ShimmerButton } from '@/components/ui/shimmer-button';
+import { RainbowButton } from '@/components/ui/rainbow-button';
 
 const Index = () => {
   const [credentials, setCredentials] = useState<Credential[]>([]);
@@ -131,17 +131,10 @@ const Index = () => {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="inline-block mb-4"
           >
-            <ShimmerButton 
-              shimmerColor="#ffffff" 
-              shimmerSize="0.05em"
-              shimmerDuration="3s"
-              borderRadius="100px"
-              background="rgba(0, 0, 0, 0.2)"
-              className="text-xs font-medium uppercase tracking-wider"
-            >
-              <Zap size={14} className="mr-1.5 inline-block" />
+            <RainbowButton glowing>
+              <Zap size={14} className="mr-1.5" />
               Secure Password Management
-            </ShimmerButton>
+            </RainbowButton>
           </motion.div>
           
           <motion.h1 
@@ -159,8 +152,7 @@ const Index = () => {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.4 }}
           >
-            Create strong usernames and passwords for your accounts. 
-            Export to PDF for secure offline storage.
+            Create strong usernames and passwords to keep your online accounts secure.
           </motion.p>
         </motion.div>
         

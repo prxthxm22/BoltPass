@@ -98,13 +98,10 @@ export default {
             transform: "translateY(-5px)",
           },
         },
-        "shimmer-slide": {
-          from: { backgroundPosition: "0 0" },
-          to: { backgroundPosition: "calc(100cqw * 1.5) 0" },
-        },
-        "spin-around": {
-          from: { transform: "rotate(0deg)" },
-          to: { transform: "rotate(360deg)" },
+        rainbow: {
+          "0%": { backgroundPosition: "0% 50%" },
+          "50%": { backgroundPosition: "100% 50%" },
+          "100%": { backgroundPosition: "0% 50%" },
         },
       },
       animation: {
@@ -115,8 +112,7 @@ export default {
         "fade-out": "fade-out 0.5s ease-out forwards",
         pulse: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
         float: "float 3s ease-in-out infinite",
-        "shimmer-slide": "shimmer-slide calc(var(--speed, 3s) * 2) linear infinite",
-        "spin-around": "spin-around calc(var(--speed, 3s) * 4) linear infinite",
+        rainbow: "rainbow 6s linear infinite",
       },
     },
   },
