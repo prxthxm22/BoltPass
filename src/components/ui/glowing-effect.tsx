@@ -104,21 +104,7 @@ const GlowingEffect = memo(
 
       const handleScroll = () => handleMove();
       
-      const handlePointerMove = (e: PointerEvent) => {
-        const activeGlowEl = document.getElementById(`active-glow-${id}`);
-        
-        if (!activeGlowEl || activeGlowEl.getAttribute('data-id') === id) {
-          document.querySelectorAll('[id^="active-glow-"]').forEach(el => el.remove());
-          
-          const newActiveEl = document.createElement('div');
-          newActiveEl.id = `active-glow-${id}`;
-          newActiveEl.setAttribute('data-id', id);
-          newActiveEl.style.display = 'none';
-          document.body.appendChild(newActiveEl);
-          
-          handleMove(e);
-        }
-      };
+      const handlePointerMove = (e: PointerEvent) => handleMove(e);
 
       window.addEventListener("scroll", handleScroll, { passive: true });
       document.body.addEventListener("pointermove", handlePointerMove, {

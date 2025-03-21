@@ -130,7 +130,6 @@ const Index = () => {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="inline-flex items-center justify-center p-1.5 px-3 rounded-full bg-white/5 border border-white/10 text-xs font-medium uppercase tracking-wider mb-4 relative"
           >
-            <GlowingEffect disabled={false} id="secure-badge" spread={25} borderWidth={1.5} />
             <Zap size={14} className="mr-1.5" />
             Secure Password Management
           </motion.div>
