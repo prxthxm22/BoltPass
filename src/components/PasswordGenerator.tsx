@@ -10,6 +10,7 @@ import { RefreshCw, Eye, EyeOff, Copy, Check } from 'lucide-react';
 import { motion } from 'framer-motion';
 import PasswordStrengthMeter from './PasswordStrengthMeter';
 import { toast } from 'sonner';
+import { GlowingEffect } from '@/components/ui/glowing-effect';
 
 interface PasswordGeneratorProps {
   onGenerate: (password: string) => void;
@@ -86,11 +87,12 @@ const PasswordGenerator: React.FC<PasswordGeneratorProps> = ({
   
   return (
     <motion.div 
-      className={`glass-card p-6 rounded-xl w-full ${className}`}
+      className={`glass-card p-6 rounded-xl w-full relative ${className}`}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.1 }}
     >
+      <GlowingEffect disabled={false} />
       <h2 className="text-xl font-semibold mb-4">Password Generator</h2>
       
       <div className="space-y-4">

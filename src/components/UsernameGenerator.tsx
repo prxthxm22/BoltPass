@@ -15,6 +15,7 @@ import {
 import { motion } from 'framer-motion';
 import { RefreshCw, Copy, Check } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
+import { GlowingEffect } from '@/components/ui/glowing-effect';
 
 interface UsernameGeneratorProps {
   onGenerate: (username: string) => void;
@@ -90,11 +91,12 @@ const UsernameGenerator: React.FC<UsernameGeneratorProps> = ({
   
   return (
     <motion.div 
-      className={`glass-card p-6 rounded-xl w-full ${className}`}
+      className={`glass-card p-6 rounded-xl w-full relative ${className}`}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
+      <GlowingEffect disabled={false} />
       <h2 className="text-xl font-semibold mb-4">Username Generator</h2>
       
       <div className="space-y-4">
