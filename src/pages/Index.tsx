@@ -10,8 +10,7 @@ import { motion } from 'framer-motion';
 import { Shield, Zap, Lock } from 'lucide-react';
 import { toast } from "sonner";
 import { downloadPDF } from '../utils/pdfGenerator';
-import { GlowingEffect } from '@/components/ui/glowing-effect';
-import { RainbowButton } from '@/components/ui/rainbow-button';
+import { GlowEffectButton } from '@/components/ui/glow-effect-button';
 
 const Index = () => {
   const [credentials, setCredentials] = useState<Credential[]>([]);
@@ -131,10 +130,17 @@ const Index = () => {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="inline-block mb-4"
           >
-            <RainbowButton glowing>
+            <GlowEffectButton 
+              rightIcon={null}
+              colors={['#FF5733', '#33FF57', '#3357FF', '#F1C40F']}
+              mode="colorShift"
+              blur="medium"
+              scale={1.05}
+              buttonClassName="bg-white/5 border border-white/10 px-4 py-2"
+            >
               <Zap size={14} className="mr-1.5" />
               Secure Password Management
-            </RainbowButton>
+            </GlowEffectButton>
           </motion.div>
           
           <motion.h1 
@@ -152,7 +158,8 @@ const Index = () => {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.4 }}
           >
-            Create strong usernames and passwords to keep your online accounts secure.
+            Create strong usernames and passwords for your accounts. 
+            Export to PDF for secure offline storage.
           </motion.p>
         </motion.div>
         
