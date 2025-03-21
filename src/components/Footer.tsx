@@ -32,6 +32,14 @@ const Footer: React.FC = () => {
             </Button>
           </div>
           
+          <div className="mb-2 mt-1">
+            <img 
+              src="/lovable-uploads/white_logo.svg" 
+              alt="BoltPass Logo" 
+              className="h-5 opacity-60" 
+            />
+          </div>
+          
           <p className="text-xs text-muted-foreground">
             &copy; {new Date().getFullYear()} BoltPass. All rights reserved.
           </p>
