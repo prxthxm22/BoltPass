@@ -17,7 +17,7 @@ const Header: React.FC = () => {
           transition={{ type: "spring", stiffness: 300 }}
         >
           <img 
-            src="/lovable-uploads/ac546967-fa11-457b-97d0-f2665db5b078.png" 
+            src="/lovable-uploads/white_logo.svg" 
             alt="BoltPass Logo" 
             className="h-12 md:h-16" 
           />
